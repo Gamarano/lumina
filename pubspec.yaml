@@ -1,25 +1,23 @@
-name: lumina
-description: "Lumina: Funções em Jogo — aplicativo educacional para ensino e prática de funções de 1º e 2º grau."
-publish_to: 'none'
+name: lumina_funcoes_em_acao
+description: "Aplicativo educacional para ensino de funções matemáticas."
+
+publish_to: 'none' 
 
 version: 1.0.0+1
 
 environment:
   sdk: ^3.9.2
 
-authors:
-  - "Thulio Gamarano <thuliogamarano@gmail.com>"
-
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  flutter_riverpod: ^2.3.0
-  fl_chart: ^0.65.0
-  flutter_math_fork: ^0.7.4
-  shared_preferences: ^2.0.18
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
+  provider: ^6.1.5+1
+  fl_chart: ^1.1.1
+  shared_preferences: ^2.5.3
+  google_fonts: ^6.3.2
+  http: ^1.5.0
+  google_generative_ai: ^0.4.7
 
 dev_dependencies:
   flutter_test:

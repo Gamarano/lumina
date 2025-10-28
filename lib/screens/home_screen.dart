@@ -1,84 +1,129 @@
 import 'package:flutter/material.dart';
-import 'package:lumina/screens/laboratorio_screen.dart';
-import 'quiz_screen.dart'; // ajuste o caminho se o arquivo estiver em outra pasta (ex: 'screens/quiz_screen.dart')
+import 'learn_screen.dart';
+import 'quiz_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  // Helper para criar botões padronizados
-  Widget _menuButton(BuildContext c, String label, VoidCallback onTap) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
-        child: Text(label, style: const TextStyle(fontSize: 18)),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text(
+          'Lumina - Funções em Ação',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.blue[700],
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo/Título
+            const CircleAvatar(
+              radius: 60,
+              backgroundColor: Colors.blue,
+              child: Icon(
+                Icons.functions,
+                size: 50,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Bem-vindo ao Lumina!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Aprenda funções matemáticas de forma interativa e divertida',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 40),
+            
+            // Botões de navegação
+            Expanded(
+              child: Column(
+                children: [
+                  _buildMenuButton(
+                    icon: Icons.school,
+                    title: 'Aprender',
+                    subtitle: 'Explore funções lineares e quadráticas',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LearnScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMenuButton(
+                    icon: Icons.quiz,
+                    title: 'Quiz',
+                    subtitle: 'Teste seus conhecimentos',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const QuizScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMenuButton(
+                    icon: Icons.person,
+                    title: 'Perfil',
+                    subtitle: 'Veja seu progresso',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lumina — Funções em Jogo'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            const Text(
-              'Escolha um modo',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            // Quiz — navega para QuizScreen
-            _menuButton(context, 'Quiz (1º / 2º grau)', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const QuizScreen()),
-              );
-            }),
-            const SizedBox(height: 8),
-
-            // Laboratório
-            _menuButton(context, 'Laboratório', () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(builder: (_) => const LaboratorioScreen())
-              );              
-            }),
-            const SizedBox(height: 8),
-
-            // Aprenda Mais
-            _menuButton(context, 'Aprenda Mais', () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Aprenda Mais: em desenvolvimento')),
-              );
-            }),
-            const SizedBox(height: 8),
-
-            // Perfil
-            _menuButton(context, 'Perfil', () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Perfil: em desenvolvimento')),
-              );
-            }),
-            const SizedBox(height: 8),
-
-            // Configurações
-            _menuButton(context, 'Configurações', () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Configurações: em desenvolvimento')),
-              );
-            }),
-
-            const Spacer(),
-            const Text('Versão inicial — Trabalho acadêmico'),
-          ],
+  Widget _buildMenuButton({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 2,
+      child: ListTile(
+        leading: Icon(icon, size: 30, color: Colors.blue),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
       ),
     );
   }
