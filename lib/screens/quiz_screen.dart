@@ -15,36 +15,44 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   int? _selectedAnswer;
   bool _showResult = false;
+  QuestionType _selectedType = QuestionType.both;
+  int _questionCount = 5;
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => QuizController(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Quiz de Funções'),
-          backgroundColor: Colors.blue[700],
-          foregroundColor: Colors.white,
-        ),
-        body: Consumer3<QuizController, UserController, QuizController>(
-          builder: (context, quizController, userController, _, child) {
-            if (quizController.isLoading) {
-              return _buildLoadingScreen();
-            }
-
-            if (quizController.questions.isEmpty) {
-              return _buildStartScreen(quizController);
-            }
-
-            if (quizController.isQuizFinished) {
-              return _buildResultsScreen(quizController, userController);
-            }
-
-            return _buildQuizScreen(quizController);
-          },
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Quiz Infinito - Funções'),
+        backgroundColor: Colors.blue[700],
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info),
+            onPressed: _showQuizInfo,
+          ),
+        ],
+      ),
+      body: Consumer2<QuizController, UserController>(
+        builder: (context, quizController, userController, child) {
+          return _buildBody(quizController, userController);
+        },
       ),
     );
+  }
+
+  Widget _buildBody(QuizController quizController, UserController userController) {
+    // Tela de carregamento inicial
+    if (quizController.isLoading && quizController.questions.isEmpty) {
+      return _buildLoadingScreen();
+    }
+
+    // Tela inicial (sem questões)
+    if (quizController.questions.isEmpty) {
+      return _buildStartScreen(quizController, userController);
+    }
+
+    // Tela do quiz em andamento (SEMPRE - quiz infinito)
+    return _buildInfiniteQuizScreen(quizController, userController);
   }
 
   Widget _buildLoadingScreen() {
@@ -54,10 +62,10 @@ class _QuizScreenState extends State<QuizScreen> {
         children: [
           CircularProgressIndicator(),
           SizedBox(height: 20),
-          Text('Gerando questões personalizadas...'),
+          Text('Conectando com a IA...'),
           SizedBox(height: 10),
           Text(
-            'Usando IA para criar seu quiz!',
+            'Gerando questões inteligentes!',
             style: TextStyle(color: Colors.grey),
           ),
         ],
@@ -65,10 +73,7 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _buildStartScreen(QuizController quizController) {
-    QuestionType selectedType = QuestionType.both;
-    int questionCount = 5;
-
+  Widget _buildStartScreen(QuizController quizController, UserController userController) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -78,14 +83,14 @@ class _QuizScreenState extends State<QuizScreen> {
             radius: 60,
             backgroundColor: Colors.blue,
             child: Icon(
-              Icons.quiz,
+              Icons.auto_awesome,
               size: 50,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 30),
           const Text(
-            'Quiz de Funções Matemáticas',
+            'Quiz Infinito com IA',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -95,7 +100,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           const SizedBox(height: 10),
           const Text(
-            'Teste seus conhecimentos sobre funções lineares e quadráticas',
+            'Questões ilimitadas geradas por inteligência artificial',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
@@ -109,30 +114,30 @@ class _QuizScreenState extends State<QuizScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Tipo de Funções:',
+                    '🎯 Foco do Estudo:',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 10),
                   DropdownButton<QuestionType>(
-                    value: selectedType,
+                    value: _selectedType,
                     isExpanded: true,
                     onChanged: (QuestionType? newValue) {
                       setState(() {
-                        selectedType = newValue!;
+                        _selectedType = newValue!;
                       });
                     },
                     items: const [
                       DropdownMenuItem(
                         value: QuestionType.linear,
-                        child: Text('Apenas Funções Lineares (1º Grau)'),
+                        child: Text('📈 Funções Lineares (1º Grau)'),
                       ),
                       DropdownMenuItem(
                         value: QuestionType.quadratic,
-                        child: Text('Apenas Funções Quadráticas (2º Grau)'),
+                        child: Text('📊 Funções Quadráticas (2º Grau)'),
                       ),
                       DropdownMenuItem(
                         value: QuestionType.both,
-                        child: Text('Ambos os Tipos'),
+                        child: Text('🎲 Ambos os Tipos'),
                       ),
                     ],
                   ),
@@ -142,7 +147,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           const SizedBox(height: 20),
           
-          // Seletor de quantidade
+          // Seletor de quantidade inicial
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -150,22 +155,22 @@ class _QuizScreenState extends State<QuizScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Número de Questões:',
+                    '🚀 Questões Iniciais:',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 10),
                   DropdownButton<int>(
-                    value: questionCount,
+                    value: _questionCount,
                     isExpanded: true,
                     onChanged: (int? newValue) {
                       setState(() {
-                        questionCount = newValue!;
+                        _questionCount = newValue!;
                       });
                     },
                     items: const [
-                      DropdownMenuItem(value: 5, child: Text('5 questões')),
-                      DropdownMenuItem(value: 10, child: Text('10 questões')),
-                      DropdownMenuItem(value: 15, child: Text('15 questões')),
+                      DropdownMenuItem(value: 5, child: Text('5 questões para começar')),
+                      DropdownMenuItem(value: 10, child: Text('10 questões para começar')),
+                      DropdownMenuItem(value: 15, child: Text('15 questões para começar')),
                     ],
                   ),
                 ],
@@ -174,19 +179,36 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           const SizedBox(height: 30),
           
+          // Estatísticas rápidas
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatItem('Pontuação', '${userController.user.points}'),
+                  _buildStatItem('Medalhas', '${userController.user.badges.length}'),
+                  _buildStatItem('Funções', '${userController.user.studiedFunctions.length}'),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 30),
+          
           // Botão iniciar
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () {
-              quizController.loadQuestions(selectedType, questionCount);
+              quizController.loadQuestions(_selectedType, _questionCount);
               _resetQuizState();
             },
+            icon: const Icon(Icons.play_arrow),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
             ),
-            child: const Text(
-              'Iniciar Quiz',
+            label: const Text(
+              'Iniciar Quiz Infinito',
               style: TextStyle(fontSize: 18),
             ),
           ),
@@ -195,221 +217,256 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _buildQuizScreen(QuizController quizController) {
+  Widget _buildInfiniteQuizScreen(QuizController quizController, UserController userController) {
     final question = quizController.currentQuestion!;
     
     return Column(
       children: [
-        // Barra de progresso
-        LinearProgressIndicator(
-          value: (quizController.currentQuestionIndex + 1) / 
-                 quizController.totalQuestions,
-          backgroundColor: Colors.grey[300],
-          color: Colors.blue,
-        ),
-        
-        // Pontuação atual
-        Container(
-          padding: const EdgeInsets.all(16),
-          color: Colors.blue[50],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildScoreItem('Pontuação', '${quizController.score}'),
-              _buildScoreItem('Sequência', '${quizController.streak}'),
-              _buildScoreItem(
-                'Questão', 
-                '${quizController.currentQuestionIndex + 1}/${quizController.totalQuestions}'
-              ),
-            ],
-          ),
-        ),
+        // Barra de progresso e carregamento
+        _buildQuizHeader(quizController),
         
         // Questão
         Expanded(
           child: SingleChildScrollView(
-            child: QuizCard(
-              question: question,
-              currentIndex: quizController.currentQuestionIndex,
-              totalQuestions: quizController.totalQuestions,
-              onAnswerSelected: (index) {
-                setState(() {
-                  _selectedAnswer = index;
-                  _showResult = true;
-                });
-                quizController.checkAnswer(index);
-              },
-              selectedAnswer: _selectedAnswer,
-              showResult: _showResult,
+            child: Column(
+              children: [
+                QuizCard(
+                  question: question,
+                  currentIndex: quizController.currentQuestionIndex,
+                  totalQuestions: quizController.questions.length,
+                  onAnswerSelected: (index) {
+                    setState(() {
+                      _selectedAnswer = index;
+                      _showResult = true;
+                    });
+                    
+                    // Atualiza pontuação e salva
+                    quizController.checkAnswer(index, (pointsEarned, streak, totalScore) {
+                      userController.addPoints(pointsEarned, streak);
+                      
+                      // Registra função estudada do quiz
+                      userController.addFunctionFromQuiz(
+                        question.question, 
+                        question.options[question.correctAnswerIndex]
+                      );
+                    });
+                  },
+                  selectedAnswer: _selectedAnswer,
+                  showResult: _showResult,
+                ),
+                
+                // Indicador de carregamento de mais questões
+                if (quizController.isLoading && quizController.questions.isNotEmpty)
+                  _buildLoadingMoreQuestions(),
+              ],
             ),
           ),
         ),
         
         // Botões de navegação
-        if (_showResult) _buildNavigationButtons(quizController),
+        if (_showResult) _buildNavigationButtons(quizController, userController),
       ],
     );
   }
 
-  Widget _buildScoreItem(String label, String value) {
+  Widget _buildQuizHeader(QuizController quizController) {
+    return Column(
+      children: [
+        // Barra de progresso da sessão
+        LinearProgressIndicator(
+          value: quizController.questions.isEmpty ? 0 : 
+                 (quizController.currentQuestionIndex + 1) / quizController.questions.length,
+          backgroundColor: Colors.grey[300],
+          color: Colors.blue,
+        ),
+        
+        // Estatísticas em tempo real
+        Container(
+          padding: const EdgeInsets.all(12),
+          color: Colors.blue[50],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('Pontos', '${quizController.sessionScore}'),
+              _buildStatItem('Sequência', '${quizController.streak}'),
+              _buildStatItem('Acertos', '${quizController.totalCorrect}/${quizController.totalAnswered}'),
+              _buildStatItem('Questão', '${quizController.currentQuestionIndex + 1}'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingMoreQuestions() {
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          SizedBox(height: 20),
+          CircularProgressIndicator(),
+          SizedBox(height: 10),
+          Text(
+            'Carregando mais questões...',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
         Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-        Text(
           value,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Colors.blue,
           ),
         ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.grey,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildNavigationButtons(QuizController quizController) {
+  Widget _buildNavigationButtons(QuizController quizController, UserController userController) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          if (!quizController.isLastQuestion) ...[
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedAnswer = null;
-                    _showResult = false;
-                  });
-                  quizController.nextQuestion();
-                },
-                child: const Text('Próxima Questão'),
-              ),
-            ),
-          ] else ...[
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedAnswer = null;
-                    _showResult = false;
-                  });
-                  quizController.nextQuestion();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Ver Resultados'),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildResultsScreen(QuizController quizController, UserController userController) {
-    // Atualiza a pontuação do usuário
-    userController.addPoints(quizController.score);
-    
-    // Verifica medalhas
-    if (quizController.streak >= 10) {
-      userController.addBadge('Mestre das Retas');
-    }
-    if (quizController.score >= 80) {
-      userController.addBadge('Expert em Funções');
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.emoji_events,
-            size: 80,
-            color: Colors.amber,
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Quiz Concluído!',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
-          ),
-          const SizedBox(height: 30),
-          
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
+          // Mensagem de bônus por sequência
+          if (quizController.streak >= 10 && quizController.streak % 10 == 0)
+            Container(
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildResultItem('Pontuação Final', '${quizController.score}'),
-                  _buildResultItem('Questões Corretas', '${(quizController.score / 10).toInt()}/${quizController.totalQuestions}'),
-                  _buildResultItem('Maior Sequência', '${quizController.streak}'),
-                  _buildResultItem('Pontos Ganhos', '+${quizController.score}'),
+                  Icon(Icons.celebration, color: Colors.green[700], size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Bônus: +50 pontos por ${quizController.streak} acertos seguidos!',
+                    style: TextStyle(
+                      color: Colors.green[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 30),
           
           Row(
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    quizController.resetQuiz();
-                    _resetQuizState();
-                  },
-                  child: const Text('Jogar Novamente'),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const QuizScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.white,
+              // Botão pular (apenas se não for a primeira questão)
+              if (quizController.currentQuestionIndex > 0)
+                Expanded(
+                  flex: 1,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      quizController.skipQuestion();
+                      _resetQuizState();
+                    },
+                    child: const Text('Pular'),
                   ),
-                  child: const Text('Novo Quiz'),
+                ),
+              if (quizController.currentQuestionIndex > 0) const SizedBox(width: 12),
+              
+              // Botão próxima questão
+              Expanded(
+                flex: quizController.currentQuestionIndex > 0 ? 2 : 1,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedAnswer = null;
+                      _showResult = false;
+                    });
+                    quizController.nextQuestion();
+                  },
+                  child: const Text('Próxima Questão'),
                 ),
               ),
             ],
           ),
+          
+          // Botão para novo quiz
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: () {
+              _showNewQuizDialog(quizController);
+            },
+            child: const Text('Iniciar Novo Quiz'),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildResultItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 16),
+  void _showNewQuizDialog(QuizController quizController) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Novo Quiz'),
+        content: const Text('Deseja iniciar um novo quiz? O progresso atual será mantido.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
           ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              quizController.loadNewQuestions(_selectedType, _questionCount);
+              _resetQuizState();
+            },
+            child: const Text('Novo Quiz'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showQuizInfo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Como funciona o Quiz Infinito?'),
+        content: const SingleChildScrollView(
+          child: Text(
+            '🎯 **Sistema de Pontuação:**\n'
+            '• +10 pontos por acerto\n'
+            '• -5 pontos por erro\n'
+            '• +50 pontos bônus a cada 10 acertos consecutivos\n'
+            '• Medalha a cada 100 pontos totais\n\n'
+            
+            '🤖 **IA Generativa:**\n'
+            '• Questões geradas automaticamente\n'
+            '• Conteúdo sempre novo e variado\n'
+            '• Foco em teoria e interpretação\n'
+            '• Fallback para questões locais se necessário\n\n'
+            
+            '📈 **Progresso Infinito:**\n'
+            '• Continue praticando sem limites\n'
+            '• Novas questões carregadas automaticamente\n'
+            '• Seu progresso é salvo continuamente',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Entendi'),
           ),
         ],
       ),

@@ -33,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 
                 // Estatísticas
-                _buildStatisticsSection(user),
+                _buildStatisticsSection(user, userController),
                 const SizedBox(height: 30),
                 
                 // Medalhas
@@ -109,34 +109,44 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatisticsSection(UserModel user) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '📊 Estatísticas',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+  Widget _buildStatisticsSection(UserModel user, UserController userController) {
+  final stats = userController.stats;
+  
+  return Card(
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📊 Estatísticas Detalhadas',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem('Pontos Totais', '${user.points}'),
-                _buildStatItem('Medalhas', '${user.badges.length}'),
-                _buildStatItem('Funções', '${user.studiedFunctions.length}'),
-              ],
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('Pontos', '${user.points}'),
+              _buildStatItem('Medalhas', '${user.badges.length}'),
+              _buildStatItem('Funções', '${user.studiedFunctions.length}'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('Taxa Acerto', '${stats['accuracy']}%'),
+              _buildStatItem('Questões', '${user.points ~/ 10}'),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildStatItem(String label, String value) {
     return Column(
